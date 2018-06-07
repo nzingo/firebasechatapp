@@ -69,11 +69,20 @@ public class SignUpActivity extends AppCompatActivity {
 
                             FirebaseUser current_user = mAuth.getCurrentUser();
                             user_ref = root_ref.child("users").child(current_user.getUid());
-                            user_ref.setValue(user);
+                            user_ref.setValue(user).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                @Override
+                                public void onComplete(@NonNull Task<Void> task) {
+                                    if(task.isSuccessful()){
 
-                            Intent intent = new Intent(SignUpActivity.this,MainActivity.class);
-                            startActivity(intent);
-                            finish();
+                                        Intent intent = new Intent(SignUpActivity.this,MainActivity.class);
+                                        startActivity(intent);
+                                        finish();
+
+                                    }
+                                }
+                            });
+
+
                         }else {
                             spinner.setVisibility(View.GONE);
                             Toast.makeText(SignUpActivity.this,"sign up failed",Toast.LENGTH_LONG).show();
