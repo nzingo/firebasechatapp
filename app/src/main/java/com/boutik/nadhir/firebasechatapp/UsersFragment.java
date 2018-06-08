@@ -34,7 +34,7 @@ public class UsersFragment extends Fragment {
         mRecyclerView.setHasFixedSize(true);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
 
-        usersRef = FirebaseDatabase.getInstance().getReference().child("users");
+        usersRef = FirebaseDatabase.getInstance().getReference().child("users");        //time consoming!!!!!!!!!!!!!!!!!!!
         //Query usersQuery = usersRef.orderByKey();
         FirebaseRecyclerOptions usersOptions = new FirebaseRecyclerOptions.Builder<UserModel>()
                 .setQuery(usersRef, UserModel.class).build();
@@ -44,6 +44,8 @@ public class UsersFragment extends Fragment {
             protected void onBindViewHolder(@NonNull UsersViewHolder holder, int position, @NonNull UserModel model) {
                 holder.setName(model.getUsername());
                 holder.setEmail(model.getEmail());
+                holder.setOnline(model.isOnline());
+
             }
 
             @NonNull

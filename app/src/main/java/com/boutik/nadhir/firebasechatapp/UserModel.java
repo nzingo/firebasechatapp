@@ -4,8 +4,9 @@ public class UserModel {
 
 
 
-    public String username;
-    public String email;
+    private String username;
+    private String email;
+    private boolean online;
 
 
     public UserModel() {
@@ -32,5 +33,13 @@ public class UserModel {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public boolean isOnline() {
+        return online;
+    }
+
+    public void setOnline(boolean online) {
+        this.online = online;
     }
 }

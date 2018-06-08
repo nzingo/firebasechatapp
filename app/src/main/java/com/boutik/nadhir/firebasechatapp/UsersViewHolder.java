@@ -20,4 +20,10 @@ public class UsersViewHolder extends RecyclerView.ViewHolder{
         TextView userEmailView = mView.findViewById(R.id.display_email);
         userEmailView.setText(name);
     }
+    public void setOnline(boolean isOnline){
+        if(!isOnline){
+            View online =  mView.findViewById(R.id.online);
+            online.setVisibility(View.INVISIBLE);
+        }
+    }
 }

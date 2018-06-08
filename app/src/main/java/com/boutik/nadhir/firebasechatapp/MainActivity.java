@@ -14,6 +14,8 @@ import android.view.MenuItem;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -21,6 +23,9 @@ public class MainActivity extends AppCompatActivity {
     private ViewPager pager;
     private PagerAdapter pager_adapter;
     private TabLayout tabLayout;
+    private DatabaseReference presenceRef;
+    private DatabaseReference mDatabaseRef;
+    private FirebaseUser currentUser;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,6 +35,17 @@ public class MainActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
 
         mAuth = FirebaseAuth.getInstance();
+        currentUser = mAuth.getCurrentUser();
+        mDatabaseRef = FirebaseDatabase.getInstance().getReference();
+
+        if(currentUser != null){
+            presenceRef = mDatabaseRef.child("users").child(currentUser.getUid()).child("online");
+            presenceRef.setValue(true);
+            presenceRef.onDisconnect().setValue(false);
+        }
+
+
+
         pager = findViewById(R.id.pager);
         pager_adapter = new PagerAdapter(getSupportFragmentManager());
         pager.setAdapter(pager_adapter);
@@ -43,16 +59,21 @@ public class MainActivity extends AppCompatActivity {
     public void onStart() {
         super.onStart();
 
-        FirebaseUser currentUser = mAuth.getCurrentUser();
         if(currentUser == null){
             Intent intent = new Intent(MainActivity.this,RegisterActivity.class);
             startActivity(intent);
             finish();
         }else{
+
             getSupportActionBar().setTitle(currentUser.getEmail());
         }
     }
 
+    @Override
+    protected void onStop() {
+        super.onStop();
+       // presenceRef.onDisconnect().cancel();
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -70,6 +91,7 @@ public class MainActivity extends AppCompatActivity {
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_logout) {
+            presenceRef.setValue(false);
             FirebaseAuth.getInstance().signOut();
             Intent intent = new Intent(MainActivity.this,RegisterActivity.class);
             startActivity(intent);

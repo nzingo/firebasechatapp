@@ -1,21 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:padding="10dp">
 
-    <ImageView
+    <de.hdodenhof.circleimageview.CircleImageView
+        xmlns:app="http://schemas.android.com/apk/res-auto"
         android:id="@+id/avatar"
-        android:layout_width="50dp"
-        android:layout_height="50dp"
-        android:src="@mipmap/ic_launcher" />
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_centerVertical="true"
+        android:src="@drawable/default_profile_image"/>
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_toRightOf="@+id/avatar"
         android:layout_centerVertical="true"
         android:orientation="vertical"
-        android:layout_marginLeft="20dp"
+        android:layout_marginLeft="10dp"
         android:layout_toEndOf="@+id/avatar"
         android:layout_marginStart="20dp">
 
@@ -23,8 +26,8 @@
             android:id="@+id/display_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="16dp"
-            android:textStyle="bold"
+            android:textSize="20dp"
+            android:textColor="#000000"
             android:text="user name"/>
         <TextView
             android:id="@+id/display_email"
@@ -33,5 +36,14 @@
             android:text="user email"/>
 
     </LinearLayout>
+
+    <View
+        android:id="@+id/online"
+        android:layout_width="12dp"
+        android:layout_height="12dp"
+        android:layout_alignBottom="@+id/avatar"
+        android:layout_alignEnd="@+id/avatar"
+        android:background="@drawable/circle"
+        android:layout_alignRight="@+id/avatar" />
 
 </RelativeLayout>
