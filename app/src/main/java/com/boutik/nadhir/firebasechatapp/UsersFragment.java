@@ -1,21 +1,22 @@
 package com.boutik.nadhir.firebasechatapp;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.TimingLogger;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 
+import com.boutik.nadhir.firebasechatapp.models.UserModel;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.Query;
 
 public class UsersFragment extends Fragment {
 
@@ -34,7 +35,14 @@ public class UsersFragment extends Fragment {
         mRecyclerView.setHasFixedSize(true);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
 
+        /******************************************************************************************************/
+        TimingLogger timings = new TimingLogger("ffs","database reference");
         usersRef = FirebaseDatabase.getInstance().getReference().child("users");        //time consoming!!!!!!!!!!!!!!!!!!!
+        timings.addSplit("work A");
+        timings.dumpToLog();
+        /*****************************************************************************************************/
+
+
         //Query usersQuery = usersRef.orderByKey();
         FirebaseRecyclerOptions usersOptions = new FirebaseRecyclerOptions.Builder<UserModel>()
                 .setQuery(usersRef, UserModel.class).build();
@@ -45,6 +53,20 @@ public class UsersFragment extends Fragment {
                 holder.setName(model.getUsername());
                 holder.setEmail(model.getEmail());
                 holder.setOnline(model.isOnline());
+
+
+                final String uid = getRef(position).getKey();
+                final String user_name = model.getUsername();
+                holder.mView.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        Intent intent = new Intent(getActivity(),ChatActivity.class);
+                        intent.putExtra("uid",uid);
+                        intent.putExtra("user_name",user_name);
+                        startActivity(intent);
+
+                    }
+                });
 
             }
 
