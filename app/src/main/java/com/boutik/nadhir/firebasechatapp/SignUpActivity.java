@@ -75,6 +75,9 @@ public class SignUpActivity extends AppCompatActivity {
                                 public void onComplete(@NonNull Task<Void> task) {
                                     if(task.isSuccessful()){
 
+                                        //user_ref.child("online").setValue(true);
+                                        //user_ref.child("online").onDisconnect().setValue(false);
+
                                         Intent intent = new Intent(SignUpActivity.this,MainActivity.class);
                                         startActivity(intent);
                                         finish();

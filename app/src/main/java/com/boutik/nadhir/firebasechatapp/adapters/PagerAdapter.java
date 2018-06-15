@@ -1,10 +1,13 @@
-package com.boutik.nadhir.firebasechatapp;
+package com.boutik.nadhir.firebasechatapp.adapters;
 
 
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
+
+import com.boutik.nadhir.firebasechatapp.fragments.ChatsFragment;
+import com.boutik.nadhir.firebasechatapp.fragments.UsersFragment;
 
 public class PagerAdapter extends FragmentPagerAdapter {
 
@@ -18,9 +21,11 @@ public class PagerAdapter extends FragmentPagerAdapter {
 
         switch (position) {
             case 0:
+
                 UsersFragment tab1 = new UsersFragment();
                 return tab1;
             case 1:
+
                 ChatsFragment tab2 = new ChatsFragment();
                 return tab2;
             default:

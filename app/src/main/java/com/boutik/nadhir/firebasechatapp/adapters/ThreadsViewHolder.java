@@ -1,13 +1,17 @@
-package com.boutik.nadhir.firebasechatapp;
+package com.boutik.nadhir.firebasechatapp.adapters;
 
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.TextView;
 
-public class UsersViewHolder extends RecyclerView.ViewHolder{
+import com.boutik.nadhir.firebasechatapp.R;
+
+
+public class ThreadsViewHolder extends RecyclerView.ViewHolder{
     View mView;
 
-    public UsersViewHolder(View itemView) {
+
+    public ThreadsViewHolder(View itemView) {
         super(itemView);
         mView = itemView;
     }
@@ -16,8 +20,8 @@ public class UsersViewHolder extends RecyclerView.ViewHolder{
         TextView userNameView = mView.findViewById(R.id.display_name);
         userNameView.setText(name);
     }
-    public void setEmail(String name) {
-        TextView userEmailView = mView.findViewById(R.id.display_email);
+    public void setMessage(String name) {
+        TextView userEmailView = mView.findViewById(R.id.display_message);
         userEmailView.setText(name);
     }
     public void setOnline(boolean isOnline){

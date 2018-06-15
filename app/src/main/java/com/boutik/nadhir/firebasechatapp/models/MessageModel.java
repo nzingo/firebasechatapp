@@ -5,12 +5,12 @@ import java.util.Map;
 public class MessageModel {
     private String text;
     private String uid;
-    private Map<String, String> time_stamp;
+    private Object time_stamp;
 
     public MessageModel() {
     }
 
-    public MessageModel(String uid, String text, Map<String, String> time_stamp) {
+    public MessageModel(String uid, String text, Object time_stamp) {
         this.text = text;
         this.time_stamp = time_stamp;
         this.uid = uid;
@@ -32,11 +32,11 @@ public class MessageModel {
         this.uid = uid;
     }
 
-    public Map<String, String> getTime_stamp() {
+    public Object getTime_stamp() {
         return time_stamp;
     }
 
-    public void setTime_stamp(Map<String, String> time_stamp) {
+    public void setTime_stamp(Object time_stamp) {
         this.time_stamp = time_stamp;
     }
 }

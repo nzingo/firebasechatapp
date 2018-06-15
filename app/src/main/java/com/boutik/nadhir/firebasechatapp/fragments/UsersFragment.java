@@ -1,4 +1,4 @@
-package com.boutik.nadhir.firebasechatapp;
+package com.boutik.nadhir.firebasechatapp.fragments;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -12,6 +12,9 @@ import android.view.View;
 import android.view.ViewGroup;
 
 
+import com.boutik.nadhir.firebasechatapp.ChatActivity;
+import com.boutik.nadhir.firebasechatapp.R;
+import com.boutik.nadhir.firebasechatapp.adapters.UsersViewHolder;
 import com.boutik.nadhir.firebasechatapp.models.UserModel;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
