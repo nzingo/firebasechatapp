@@ -6,7 +6,7 @@ public class UserModel {
 
     private String username;
     private String email;
-    private Object Last_seen;
+    private long Last_seen;
     private boolean online;
 
 
@@ -46,11 +46,11 @@ public class UserModel {
         this.online = online;
     }
 
-    public Object getLast_seen() {
+    public long getLast_seen() {
         return Last_seen;
     }
 
-    public void setLast_seen(Object last_seen) {
+    public void setLast_seen(long last_seen) {
         Last_seen = last_seen;
     }
 }

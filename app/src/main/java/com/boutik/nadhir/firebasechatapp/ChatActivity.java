@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -41,7 +42,7 @@ public class ChatActivity extends AppCompatActivity {
     private DatabaseReference threadsRef;
     private DatabaseReference usersRef;
 
-    private boolean first_time = true;
+    private boolean is_empty ;
     private EditText editText;
     private MessageModel msg;
 
@@ -58,6 +59,7 @@ public class ChatActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
+
         user_name = getIntent().getStringExtra("user_name");
         getSupportActionBar().setTitle(user_name);
 
@@ -68,35 +70,48 @@ public class ChatActivity extends AppCompatActivity {
         threadsRef = FirebaseDatabase.getInstance().getReference().child("threads");
         usersRef = FirebaseDatabase.getInstance().getReference().child("users");
 
-        editText=findViewById(R.id.editWriteMessage);
-        ImageButton send_button = findViewById(R.id.btnSend);
-
         mRecyclerView = findViewById(R.id.recyclerChat);
         mRecyclerView.setHasFixedSize(true);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         mAdapter = new MessagesAdapter(messages_list, my_id);
         mRecyclerView.setAdapter(mAdapter);
 
-        thread_key = getIntent().getStringExtra("th_key");
+        editText=findViewById(R.id.editWriteMessage);
 
+//        editText.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+//            @Override
+//            public void onFocusChange(View v, boolean hasFocus) {
+//                if (hasFocus) {
+//                    mRecyclerView.getLayoutManager().scrollToPosition(mAdapter.getItemCount());
+//                    //mRecyclerView.smoothScrollToPosition(mAdapter.getItemCount());
+//                    Log.i("Item_count",Integer.toString(mAdapter.getItemCount()));
+//                }
+//            }
+//        });
+
+
+        thread_key = getIntent().getStringExtra("th_key");
+        is_empty = false;
         if (thread_key == null){
+            is_empty = true;
             thread_key = messagesRef.push().getKey();
         }
 
         load_messages();
 
+        ImageButton send_button = findViewById(R.id.btnSend);
         send_button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                if(editText.length()>0){
                    String message_text = editText.getText().toString();
-                   msg = new MessageModel( my_id, message_text, ServerValue.TIMESTAMP);
-                   mRecyclerView.smoothScrollToPosition(mAdapter.getItemCount());
-                   if(first_time){
+                   msg = new MessageModel( my_id, message_text);
+
+                   if(is_empty){
 
                        initThread();   /************     needs to be atomic     **********/
                        sendMessage();   //
-                       first_time=false;    //
+                       is_empty=false;    //
 
                    }else{
 
@@ -119,11 +134,28 @@ public class ChatActivity extends AppCompatActivity {
 
         //thread_key = messagesRef.push().getKey();
 
-        ThreadModel thread_sender = new ThreadModel(my_id,"sheard pref","sheard pref url", msg.getText(), msg.getTime_stamp());
-        ThreadModel thread_receiver = new ThreadModel(receiver_id,"item detail","item detail", msg.getText(), msg.getTime_stamp());
+//        ThreadModel thread_sender = new ThreadModel(my_id,"sheard pref","sheard pref url", msg.getText(),false);
+//        ThreadModel thread_receiver = new ThreadModel(receiver_id,"item detail","item detail", msg.getText(),false);
+
         Map<String, Object> childUpdates = new HashMap<>();
-        childUpdates.put("/" + receiver_id + "/" + thread_key, thread_sender);
-        childUpdates.put("/" + my_id + "/" + thread_key, thread_receiver);
+
+        childUpdates.put("/" + receiver_id + "/" + thread_key + "/uid", my_id);
+        childUpdates.put("/" + receiver_id + "/" + thread_key + "/name", "sheard pref");
+        childUpdates.put("/" + receiver_id + "/" + thread_key + "/profile_img", "sheard pref url");
+        childUpdates.put("/" + receiver_id + "/" + thread_key + "/last_message", msg.getText());
+        childUpdates.put("/" + receiver_id + "/" + thread_key + "/item_title", "asking about item");
+        childUpdates.put("/" + receiver_id + "/" + thread_key + "/time_stamp", ServerValue.TIMESTAMP);
+        childUpdates.put("/" + receiver_id + "/" + thread_key + "/seen", false);
+
+
+        childUpdates.put("/" + my_id + "/" + thread_key + "/uid", receiver_id);
+        childUpdates.put("/" + my_id + "/" + thread_key + "/name", "item detail");
+        childUpdates.put("/" + my_id + "/" + thread_key + "/profile_img", "item detail");
+        childUpdates.put("/" + my_id + "/" + thread_key + "/last_message", msg.getText());
+        childUpdates.put("/" + my_id + "/" + thread_key + "/item_title", "asking about item");
+        childUpdates.put("/" + my_id + "/" + thread_key + "/time_stamp", ServerValue.TIMESTAMP);
+        childUpdates.put("/" + my_id + "/" + thread_key + "/seen", false);
+
         threadsRef.updateChildren(childUpdates);
     }
 
@@ -140,9 +172,11 @@ public class ChatActivity extends AppCompatActivity {
 
         Map<String, Object> childUpdates = new HashMap<>();
         childUpdates.put("/" + receiver_id + "/" + thread_key + "/last_message", msg.getText());
-        childUpdates.put("/" + receiver_id + "/" + thread_key + "/time_stamp", msg.getTime_stamp());
+        childUpdates.put("/" + receiver_id + "/" + thread_key + "/time_stamp", ServerValue.TIMESTAMP);
+        childUpdates.put("/" + receiver_id + "/" + thread_key + "/seen", false);
+
         childUpdates.put("/" + my_id + "/" + thread_key + "/last_message", msg.getText());
-        childUpdates.put("/" + my_id + "/" + thread_key + "/time_stamp", msg.getTime_stamp());
+        childUpdates.put("/" + my_id + "/" + thread_key + "/time_stamp", ServerValue.TIMESTAMP);
 
         threadsRef.updateChildren(childUpdates);
     }
@@ -180,4 +214,13 @@ public class ChatActivity extends AppCompatActivity {
             }
         });
         }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        if(!is_empty){
+            threadsRef.child(my_id).child(thread_key).child("seen").setValue(true);
+        }
+
+    }
 }

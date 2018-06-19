@@ -1,26 +1,26 @@
 package com.boutik.nadhir.firebasechatapp.models;
 
-import java.util.Map;
-
 public class ThreadModel {
     private String uid;
     private String name;
     private String profile_img;
+    private String item_title;
     private String last_message;
-    private Object time_stamp;
+    private long time_stamp ;
+    private boolean seen;
 
 
     public ThreadModel() {
         // Default constructor required for calls to DataSnapshot.getValue(User.class)
     }
 
-    public ThreadModel(String uid, String name, String profile_img, String last_message, Object time_stamp) {
-        this.uid = uid;
-        this.name = name;
-        this.profile_img = profile_img;
-        this.last_message = last_message;
-        this.time_stamp = time_stamp;
-    }
+//    public ThreadModel(String uid, String name, String profile_img, String last_message, boolean seen) {
+//        this.uid = uid;
+//        this.name = name;
+//        this.profile_img = profile_img;
+//        this.last_message = last_message;
+//        this.seen = seen;
+//    }
 
     public String getUid() {
         return uid;
@@ -38,11 +38,11 @@ public class ThreadModel {
         this.last_message = last_message;
     }
 
-    public Object getTime_stamp() {
+    public long getTime_stamp() {
         return time_stamp;
     }
 
-    public void setTime_stamp(Object time_stamp) {
+    public void setTime_stamp(long time_stamp) {
         this.time_stamp = time_stamp;
     }
 
@@ -60,5 +60,21 @@ public class ThreadModel {
 
     public void setProfile_img(String profile_img) {
         this.profile_img = profile_img;
+    }
+
+    public boolean isSeen() {
+        return seen;
+    }
+
+    public void setSeen(boolean seen) {
+        this.seen = seen;
+    }
+
+    public String getItem_title() {
+        return item_title;
+    }
+
+    public void setItem_title(String item_title) {
+        this.item_title = item_title;
     }
 }

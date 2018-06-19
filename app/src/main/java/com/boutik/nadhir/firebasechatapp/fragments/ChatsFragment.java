@@ -22,6 +22,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,13 +30,9 @@ import java.util.List;
 public class ChatsFragment extends Fragment {
 
     private RecyclerView mRecyclerView;
-    private final List<ThreadModel> thread_list = new ArrayList<>();
+    private List<ThreadModel> thread_list = new ArrayList<>();//final
     private List<String> key_list = new ArrayList<String>();
     private ThreadsAdapter mAdapter;
-
-    private DatabaseReference threadsRef;
-    private FirebaseUser currentUser;
-    private FirebaseAuth mAuth;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -52,30 +49,23 @@ public class ChatsFragment extends Fragment {
         mAdapter = new ThreadsAdapter(getActivity(), thread_list, key_list);
         mRecyclerView.setAdapter(mAdapter);
 
-
         load_threads();
-
 
         return view;
     }
 
-    @Override
-    public void onStart() {
-        super.onStart();
-    }
-
     private void load_threads() {
 
-        mAuth = FirebaseAuth.getInstance();
-        currentUser = mAuth.getCurrentUser();
-        threadsRef = FirebaseDatabase.getInstance().getReference().child("threads").child(currentUser.getUid());
-        threadsRef.addChildEventListener(new ChildEventListener() {
+        FirebaseAuth mAuth = FirebaseAuth.getInstance();
+        FirebaseUser currentUser = mAuth.getCurrentUser();
+        DatabaseReference threadsRef = FirebaseDatabase.getInstance().getReference().child("threads").child(currentUser.getUid());
+        Query query = threadsRef.orderByChild("time_stamp");
+        query.addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
                 ThreadModel thread = dataSnapshot.getValue(ThreadModel.class);
                 thread_list.add(thread);
                 key_list.add(dataSnapshot.getKey());
-               // Log.i("dataSnapshot.getKey",key_list.);
                 mAdapter.notifyDataSetChanged();
                 mRecyclerView.smoothScrollToPosition(mAdapter.getItemCount());
             }
@@ -83,11 +73,27 @@ public class ChatsFragment extends Fragment {
             @Override
             public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
 
+                int pos = key_list.indexOf(dataSnapshot.getKey());
+                ThreadModel thread = dataSnapshot.getValue(ThreadModel.class);
+                thread_list.remove(pos);
+                //key_list.remove(pos);
+                thread_list.add(pos,thread);
+                //key_list.add(dataSnapshot.getKey());
+                mAdapter.notifyDataSetChanged();
+                mRecyclerView.smoothScrollToPosition(mAdapter.getItemCount());
+
+                // use hash map <String thred_key , threadModel>
+                //  hashMap[dataSnapshot.getKey] = dataSnapshot.getValue()
+
             }
 
             @Override
             public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {
-
+                int pos = key_list.indexOf(dataSnapshot.getKey());
+                thread_list.remove(pos);
+                key_list.remove(pos);
+                mAdapter.notifyDataSetChanged();
+                mRecyclerView.smoothScrollToPosition(mAdapter.getItemCount());
             }
 
             @Override

@@ -18,9 +18,7 @@
         android:layout_toRightOf="@+id/avatar"
         android:layout_centerVertical="true"
         android:orientation="vertical"
-        android:layout_marginLeft="10dp"
-        android:layout_toEndOf="@+id/avatar"
-        android:layout_marginStart="20dp">
+        android:layout_toEndOf="@+id/avatar">
 
         <TextView
             android:id="@+id/display_name"
@@ -50,7 +48,7 @@
         android:layout_width="match_parent"
         android:layout_height="0.6dp"
         android:layout_alignParentBottom="true"
-        android:layout_marginLeft="90dp"
+        android:layout_marginLeft="70dp"
         android:background="@android:color/darker_gray" />
 
 </RelativeLayout>
