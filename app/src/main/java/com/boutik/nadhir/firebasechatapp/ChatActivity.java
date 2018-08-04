@@ -18,6 +18,7 @@ import com.boutik.nadhir.firebasechatapp.adapters.MessagesAdapter;
 import com.boutik.nadhir.firebasechatapp.adapters.ThreadsAdapter;
 import com.boutik.nadhir.firebasechatapp.models.MessageModel;
 import com.boutik.nadhir.firebasechatapp.models.ThreadModel;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
@@ -41,6 +42,8 @@ public class ChatActivity extends AppCompatActivity {
     private DatabaseReference messagesRef;
     private DatabaseReference threadsRef;
     private DatabaseReference usersRef;
+    private DatabaseReference myThreadRef;
+    private ChildEventListener listener;
 
     private boolean is_empty ;
     private EditText editText;
@@ -58,7 +61,6 @@ public class ChatActivity extends AppCompatActivity {
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-
 
         user_name = getIntent().getStringExtra("user_name");
         getSupportActionBar().setTitle(user_name);
@@ -78,46 +80,33 @@ public class ChatActivity extends AppCompatActivity {
 
         editText=findViewById(R.id.editWriteMessage);
 
-//        editText.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-//            @Override
-//            public void onFocusChange(View v, boolean hasFocus) {
-//                if (hasFocus) {
-//                    mRecyclerView.getLayoutManager().scrollToPosition(mAdapter.getItemCount());
-//                    //mRecyclerView.smoothScrollToPosition(mAdapter.getItemCount());
-//                    Log.i("Item_count",Integer.toString(mAdapter.getItemCount()));
-//                }
-//            }
-//        });
-
-
         thread_key = getIntent().getStringExtra("th_key");
+
         is_empty = false;
         if (thread_key == null){
             is_empty = true;
             thread_key = messagesRef.push().getKey();
         }
 
-        load_messages();
+        myThreadRef = messagesRef.child(thread_key);
+
+        init_listener();
 
         ImageButton send_button = findViewById(R.id.btnSend);
+
         send_button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                if(editText.length()>0){
                    String message_text = editText.getText().toString();
                    msg = new MessageModel( my_id, message_text);
-
                    if(is_empty){
-
-                       initThread();   /************     needs to be atomic     **********/
-                       sendMessage();   //
-                       is_empty=false;    //
-
+                       createThread();
+                       sendMessage();
+                       is_empty=false;
                    }else{
-
-                       sendMessage();   /************    (nop) needs to be atomic     **********/
-                       updateThread();  //
-
+                       sendMessage();
+                       //updateThread(); //its ok to update each time we send msg
                    }
                    editText.setText("");
                }
@@ -126,9 +115,7 @@ public class ChatActivity extends AppCompatActivity {
 
     }
 
-
-
-    public void initThread(){
+    public void createThread(){
 
         /*********************************  set name and image from uid ****************************************/
 
@@ -160,31 +147,37 @@ public class ChatActivity extends AppCompatActivity {
     }
 
     public void sendMessage(){
+
         String message_key = messagesRef.child(thread_key).push().getKey();
+
         messagesRef.child(thread_key).child(message_key).setValue(msg);
 
-        /*************         message sent succesfully        ***************/
-        //  set on complete listener
+        /***************************       test downloads       ***************************/
+        //threadsRef.child(receiver_id).child(thread_key).child("seen").setValue(false);
+        /***************************       test downloads       ***************************/
     }
 
-    /********************updateThread() timestamp and last message in both users threads******************/
     public void updateThread(){
 
         Map<String, Object> childUpdates = new HashMap<>();
-        childUpdates.put("/" + receiver_id + "/" + thread_key + "/last_message", msg.getText());
-        childUpdates.put("/" + receiver_id + "/" + thread_key + "/time_stamp", ServerValue.TIMESTAMP);
-        childUpdates.put("/" + receiver_id + "/" + thread_key + "/seen", false);
 
-        childUpdates.put("/" + my_id + "/" + thread_key + "/last_message", msg.getText());
-        childUpdates.put("/" + my_id + "/" + thread_key + "/time_stamp", ServerValue.TIMESTAMP);
+        if(msg != null) {
+            childUpdates.put("/" + receiver_id + "/" + thread_key + "/last_message", msg.getText());
+            childUpdates.put("/" + receiver_id + "/" + thread_key + "/time_stamp", ServerValue.TIMESTAMP);
+            childUpdates.put("/" + receiver_id + "/" + thread_key + "/seen", false);
 
+            childUpdates.put("/" + my_id + "/" + thread_key + "/last_message", msg.getText());
+            childUpdates.put("/" + my_id + "/" + thread_key + "/time_stamp", ServerValue.TIMESTAMP);
+        }
+        if(!is_empty){
+            childUpdates.put("/" + my_id + "/" + thread_key + "/seen", true);
+        }
         threadsRef.updateChildren(childUpdates);
     }
 
-    private void load_messages() {
+    private void init_listener() {
 
-        DatabaseReference myThreadRef = messagesRef.child(thread_key);
-        myThreadRef.addChildEventListener(new ChildEventListener() {
+        listener = new ChildEventListener() {
             @Override
             public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
                 MessageModel message = dataSnapshot.getValue(MessageModel.class);
@@ -212,15 +205,31 @@ public class ChatActivity extends AppCompatActivity {
             public void onCancelled(@NonNull DatabaseError databaseError) {
 
             }
-        });
+        };
+
+        //myThreadRef.addChildEventListener(listener);
+
         }
 
     @Override
     protected void onStop() {
         super.onStop();
-        if(!is_empty){
-            threadsRef.child(my_id).child(thread_key).child("seen").setValue(true);
-        }
+            updateThread();
+//        if(!is_empty){
+//            threadsRef.child(my_id).child(thread_key).child("seen").setValue(true);
+//        }
+    }
 
+    @Override
+    protected void onPause() {
+        super.onPause();
+        myThreadRef.removeEventListener(listener);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        messages_list.clear();
+        myThreadRef.addChildEventListener(listener);
     }
 }

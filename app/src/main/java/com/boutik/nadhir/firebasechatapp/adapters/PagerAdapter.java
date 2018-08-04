@@ -6,7 +6,8 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 
-import com.boutik.nadhir.firebasechatapp.fragments.ChatsFragment;
+import com.boutik.nadhir.firebasechatapp.fragments.ThreadsFragment;
+import com.boutik.nadhir.firebasechatapp.fragments.ThreadsFragment2;
 import com.boutik.nadhir.firebasechatapp.fragments.UsersFragment;
 
 public class PagerAdapter extends FragmentPagerAdapter {
@@ -26,7 +27,7 @@ public class PagerAdapter extends FragmentPagerAdapter {
                 return tab1;
             case 1:
 
-                ChatsFragment tab2 = new ChatsFragment();
+                ThreadsFragment2 tab2 = new ThreadsFragment2();
                 return tab2;
             default:
                 return null;

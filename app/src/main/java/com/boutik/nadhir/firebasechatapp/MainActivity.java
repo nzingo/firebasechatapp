@@ -80,24 +80,29 @@ public class MainActivity extends AppCompatActivity {
             finish();
         }else{
 
-            presenceRef = mDatabaseRef.child("users").child(currentUser.getUid());
-            final DatabaseReference connectedRef = FirebaseDatabase.getInstance().getReference(".info/connected");
-            connectedRef.addValueEventListener(new ValueEventListener() {
-                @Override
-                public void onDataChange(DataSnapshot snapshot) {
-                    boolean connected = snapshot.getValue(Boolean.class);
+            /**************************************  presence system  **************************************/
 
-                    if (connected) {
-                        presenceRef.child("online").onDisconnect().setValue(false);
-                        presenceRef.child("Last_seen").onDisconnect().setValue(ServerValue.TIMESTAMP);
-                        presenceRef.child("online").setValue(true);
-                    }
-                }
-                @Override
-                public void onCancelled(DatabaseError error) {
-                    System.err.println("Listener was cancelled at .info/connected");
-                }
-            });
+//            presenceRef = mDatabaseRef.child("users").child(currentUser.getUid());
+//            final DatabaseReference connectedRef = FirebaseDatabase.getInstance().getReference(".info/connected");
+//            connectedRef.addValueEventListener(new ValueEventListener() {
+//                @Override
+//                public void onDataChange(DataSnapshot snapshot) {
+//                    boolean connected = snapshot.getValue(Boolean.class);
+//
+//                    if (connected) {
+//                        presenceRef.child("online").onDisconnect().setValue(false);
+//                        presenceRef.child("Last_seen").onDisconnect().setValue(ServerValue.TIMESTAMP);
+//                        presenceRef.child("online").setValue(true);
+//                    }
+//
+//                }
+//                @Override
+//                public void onCancelled(DatabaseError error) {
+//                    System.err.println("Listener was cancelled at .info/connected");
+//                }
+//            });
+
+            /*************************************************************************************************/
 
             getSupportActionBar().setTitle(currentUser.getEmail());
         }
@@ -125,7 +130,7 @@ public class MainActivity extends AppCompatActivity {
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_logout) {
-            presenceRef.child("online").setValue(false);
+            //presenceRef.child("online").setValue(false);
             FirebaseAuth.getInstance().signOut();
             Intent intent = new Intent(MainActivity.this,RegisterActivity.class);
             startActivity(intent);

@@ -29,17 +29,20 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
+import java.util.Locale;
 
 public class ThreadsAdapter extends RecyclerView.Adapter<ThreadsAdapter.ThreadsViewHolder>/* implements View.OnClickListener */{
     private List<ThreadModel> thread_list;
     private List<String> key_list ;
+    private List<Boolean> thread_status ;
     private String thread_key;
     private Context context;
 
-    public ThreadsAdapter(Context context, List<ThreadModel> thread_list, List<String> key_list) {
+    public ThreadsAdapter(Context context, List<ThreadModel> thread_list, List<String> key_list, List<Boolean> thread_status) {
 
         this.key_list = key_list;
         this.thread_list = thread_list;
+        this.thread_status = thread_status;
         this.context = context;
     }
 
@@ -163,7 +166,7 @@ public class ThreadsAdapter extends RecyclerView.Adapter<ThreadsAdapter.ThreadsV
         if (date1 == null || date2 == null) {
             return 0;
         }
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmss", Locale.getDefault());
         return sdf.format(date1).compareTo(sdf.format(date2));
     }
 
